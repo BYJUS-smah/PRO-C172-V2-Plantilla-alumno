@@ -7,17 +7,17 @@ AFRAME.registerComponent("markerhandler", {
       this.askTableNumber();
     }
 
-    //Get the dishes collection
+    //Obtener la colección de platos
     var dishes = await this.getDishes();
 
-    //makerFound Event
+    //Evento makerFound
     this.el.addEventListener("markerFound", () => {
       if (tableNumber !== null) {
         var markerId = this.el.id;
         this.handleMarkerFound(dishes, markerId);
       }
     });
-    //markerLost Event
+    //Evento markerLost
     this.el.addEventListener("markerLost", () => {
       this.handleMarkerLost();
     });
@@ -25,12 +25,12 @@ AFRAME.registerComponent("markerhandler", {
   askTableNumber: function () {
     var iconUrl = "https://raw.githubusercontent.com/whitehatjr/menu-card-app/main/hunger.png";
     swal({
-      title: "Welcome to Hunger!!",
+      title: "¡¡Bienvenido a 'El antojo'!!",
       icon: iconUrl,
       content: {
         element: "input",
         attributes: {
-          placeholder: "Type your table number",
+          placeholder: "Escribe tu número de mesa",
           type: "number",
           min: 1
         }
@@ -42,10 +42,10 @@ AFRAME.registerComponent("markerhandler", {
   },
 
   handleMarkerFound: function (dishes, markerId) {
-    // Getting today's day
+    // Obtener el día de hoy
     var todaysDate = new Date();
     var todaysDay = todaysDate.getDay();
-    // Sunday - Saturday : 0 - 6
+    // Domingo - Sábado : 0 - 6
     var days = [
       "sunday",
       "monday",
@@ -56,26 +56,26 @@ AFRAME.registerComponent("markerhandler", {
       "saturday"
     ];
 
-    // Changing Model scale to initial scale
+    // Obtener el plato según el ID
     var dish = dishes.filter(dish => dish.id === markerId)[0];
 
-    //Check if the dish is available
+    // Comprobar si el plato está disponible
     if (dish.unavailable_days.includes(days[todaysDay])) {
       swal({
         icon: "warning",
         title: dish.dish_name.toUpperCase(),
-        text: "This dish is not available today!!!",
+        text: "Este platillo no está disponible hoy!!!",
         timer: 2500,
         buttons: false
       });
     } else {
-      //Changing Model scale to initial scale
+      //Cambiar la escala del modelo a la escala inicial
       var model = document.querySelector(`#model-${dish.id}`);
       model.setAttribute("position", dish.model_geometry.position);
       model.setAttribute("rotation", dish.model_geometry.rotation);
       model.setAttribute("scale", dish.model_geometry.scale);
 
-      //Update UI conent VISIBILITY of AR scene(MODEL , INGREDIENTS & PRICE)
+      //Actualizar la VISIBILIDAD de la interfaz de usuario de la escena AR (MODELO, INGREDIENTES y PRECIO)
    
       model.setAttribute("visible", true);
 
@@ -85,7 +85,7 @@ AFRAME.registerComponent("markerhandler", {
       var priceplane = document.querySelector(`#price-plane-${dish.id}`);
       priceplane.setAttribute("visible", true)
 
-      // Changing button div visibility
+      // Cambiar la visibilidad del botón div
       var buttonDiv = document.getElementById("button-div");
       buttonDiv.style.display = "flex";
 
@@ -93,19 +93,19 @@ AFRAME.registerComponent("markerhandler", {
       var orderButtton = document.getElementById("order-button");
       var orderSummaryButtton = document.getElementById("order-summary-button");
 
-      /* REPLACE COMMENT WITH THE CODE
+      /* Remplazar comentario con el código
     
     
     
     
       */
 
-      // Handling Click Events
+      // Manejo de eventos de clic
       ratingButton.addEventListener("click", function () {
         swal({
           icon: "warning",
-          title: "Rate Dish",
-          text: "Work In Progress"
+          title: "Evaluar el platillo",
+          text: "Trabajo en proceso"
         });
       });
 
@@ -116,8 +116,8 @@ AFRAME.registerComponent("markerhandler", {
 
         swal({
           icon: "https://i.imgur.com/4NZ6uLY.jpg",
-          title: "Thanks For Order !",
-          text: "Your order will serve soon on your table!",
+          title: "¡Gracias por el pedido!",
+          text: "¡Su pedido se servirá pronto en su mesa!",
           timer: 2000,
           buttons: false
         });
@@ -127,7 +127,7 @@ AFRAME.registerComponent("markerhandler", {
         this.handleOrderSummary()
       );
 
-      /* REPLACE COMMENT WITH THE CODE
+      /* Remplazar comentario con el código
     
     
     
@@ -137,7 +137,7 @@ AFRAME.registerComponent("markerhandler", {
   },
 
   handleOrder: function (tNumber, dish) {
-    //Reading current table order details
+    //Leer los detalles del pedido de la mesa actual
     firebase
       .firestore()
       .collection("tables")
@@ -147,10 +147,10 @@ AFRAME.registerComponent("markerhandler", {
         var details = doc.data();
 
         if (details["current_orders"][dish.id]) {
-          //Increasing Current Quantity
+          //Aumentar la cantidad actual
           details["current_orders"][dish.id]["quantity"] += 1;
 
-          //Calculating Subtotal of item
+          //Calculando el subtotal del artículo
           var currentQuantity = details["current_orders"][dish.id]["quantity"];
 
           details["current_orders"][dish.id]["subtotal"] =
@@ -166,7 +166,7 @@ AFRAME.registerComponent("markerhandler", {
 
         details.total_bill += dish.price;
 
-        // Updating db
+        // Actualizando la db
         firebase
           .firestore()
           .collection("tables")
@@ -193,38 +193,38 @@ AFRAME.registerComponent("markerhandler", {
   },
   handleOrderSummary: async function () {
 
-    //Getting Table Number
+    //Obtener el número de mesa
     var tNumber;
     tableNumber <= 9 ? (tNumber = `T0${tableNumber}`) : `T${tableNumber}`;
 
-    //Getting Order Summary from database
+    //Obtener el resumen del pedido de la base de datos
     var orderSummary = await this.getOrderSummary(tNumber);
 
-    //Changing modal div visibility
+    //Cambiar la visibilidad del div modal
     var modalDiv = document.getElementById("modal-div");
     modalDiv.style.display = "flex";
 
-    //Get the table element
+    //Obtener el elemento de la mesa
     var tableBodyTag = document.getElementById("bill-table-body");
 
-    //Removing old tr(table row) data
+    //Eliminar datos antiguos de tr(fila de la tabla)
     tableBodyTag.innerHTML = "";
 
-    //Get the cuurent_orders key 
+    //Obtener la clave de cuurent_orders
     var currentOrders = Object.keys(orderSummary.current_orders);
 
     currentOrders.map(i => {
 
-      //Create table row
+      //Crear la fila de la mesa
       var tr = document.createElement("tr");
 
-      //Create table cells/columns for ITEM NAME, PRICE, QUANTITY & TOTAL PRICE
+      //Crear celdas/columnas para NOMBRE DEL ARTÍCULO, PRECIO, CANTIDAD y PRECIO TOTAL
       var item = document.createElement("td");
       var price = document.createElement("td");
       var quantity = document.createElement("td");
       var subtotal = document.createElement("td");
 
-      //Add HTML content 
+      //Añadir contenido HTML 
       item.innerHTML = orderSummary.current_orders[i].item;
 
       price.innerHTML = "$" + orderSummary.current_orders[i].price;
@@ -236,17 +236,17 @@ AFRAME.registerComponent("markerhandler", {
       subtotal.innerHTML = "$" + orderSummary.current_orders[i].subtotal;
       subtotal.setAttribute("class", "text-center");
 
-      //Append cells to the row
+      //Añadir celdas a la fila
       tr.appendChild(item);
       tr.appendChild(price);
       tr.appendChild(quantity);
       tr.appendChild(subtotal);
 
-      //Append row to the table
+      //Añadir la fila a la tabla
       tableBodyTag.appendChild(tr);
     });
 
-    /* REPLACE COMMENT WITH THE CODE
+    /* Remplazar comentario con el código
     
     
     
@@ -255,7 +255,7 @@ AFRAME.registerComponent("markerhandler", {
   },
   handlePayment: function () {
 
-    /* REPLACE COMMENT WITH THE CODE
+    /* Remplazar comentario con el código
     
     
     
@@ -264,7 +264,7 @@ AFRAME.registerComponent("markerhandler", {
 
   },
   handleMarkerLost: function () {
-    // Changing button div visibility
+    // Cambiar la visibilidad del botón div
     var buttonDiv = document.getElementById("button-div");
     buttonDiv.style.display = "none";
   }
