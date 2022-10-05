@@ -210,7 +210,7 @@ AFRAME.registerComponent("markerhandler", {
     //Eliminar datos antiguos de tr(fila de la tabla)
     tableBodyTag.innerHTML = "";
 
-    //Obtener la clave de cuurent_orders
+    //Obtener la clave de current_orders
     var currentOrders = Object.keys(orderSummary.current_orders);
 
     currentOrders.map(i => {
